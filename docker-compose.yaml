@@ -6,7 +6,7 @@ services:
     container_name: netflix-backend
     ports:
       - "5000:5000"
-    env_file:
+   environment :
       - PORT=3000
       - MONGODB_URL=mongodb+srv://mihir:92201703191@cluster0.b0v4j8c.mongodb.net/Auth?retryWrites=true&w=majority
       - JWT=MIHIR
