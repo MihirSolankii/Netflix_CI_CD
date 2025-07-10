@@ -6,7 +6,7 @@ services:
     container_name: netflix-backend
     ports:
       - "5000:5000"
-   env_file:
+    env_file:
       - ./AuthApp/.env
     restart: always
 
