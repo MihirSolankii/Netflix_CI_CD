@@ -3,7 +3,6 @@ version: '3.8'
 services:
   backend:
     build: ./AuthApp
-    container_name: netflix-backend
     ports:
       - "5000:5000"
     env_file:
@@ -12,13 +11,35 @@ services:
 
   frontend:
     build: ./netflix
-    container_name: netflix-frontend
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=http://localhost:5000
+      - REACT_APP_API_URL=http://backend:5000   # use service name, not localhost
     depends_on:
       - backend
     restart: always
 
- 
+  netdata:
+    image: netdata/netdata
+    restart: unless-stopped
+    ports:
+      - "19999:19999"
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor=unconfined
+    volumes:
+      - netdataconfig:/etc/netdata
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+
+volumes:
+  netdataconfig:
+  netdatalib:
+  netdatacache:
