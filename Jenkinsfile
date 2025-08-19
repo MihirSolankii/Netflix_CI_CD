@@ -5,8 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 echo 'Cloning repository from main branch...'
-                git branch: 'main', 
-                    url: 'https://github.com/MihirSolankii/Netflix_CI_CD'
+                git branch: 'main', url: 'https://github.com/MihirSolankii/Netflix_CI_CD'
             }
         }
         
@@ -21,12 +20,11 @@ pipeline {
             }
         }
         
-        stage('Stop Existing Services') {
+        stage('Cleanup Old Containers') {
             steps {
-                echo 'Stopping any existing services...'
+                echo 'Cleaning up old containers, networks, and volumes...'
                 sh '''
-                    docker compose down || true
-                    docker ps -a --format "table {{.Names}}" | grep -E "(netflix|frontend|backend)" | xargs -r docker rm -f || true
+                    docker compose down -v || true
                 '''
             }
         }
@@ -51,7 +49,7 @@ pipeline {
             steps {
                 echo 'Starting services...'
                 sh '''
-                    docker compose up -d
+                    docker compose up -d --force-recreate
                     echo "Waiting for services to start..."
                     sleep 30
                 '''
@@ -90,7 +88,7 @@ pipeline {
                 echo "=== Container Logs ==="
                 docker compose logs || true
                 echo "=== Cleaning up ==="
-                docker compose down || true
+                docker compose down -v || true
             '''
         }
     }
