@@ -68,6 +68,17 @@ pipeline {
             }
         }
     }
+    stage('Start Netdata') {
+    steps {
+        echo 'Starting Netdata monitoring...'
+        sh '''
+            docker compose up -d netdata
+            echo "Waiting for Netdata to initialize..."
+            sleep 10
+        '''
+    }
+}
+
     
     post {
         always {
@@ -95,3 +106,4 @@ pipeline {
         }
     }
 }
+
