@@ -19,27 +19,3 @@ services:
       - backend
     restart: always
 
-  netdata:
-    image: netdata/netdata
-    restart: unless-stopped
-    ports:
-      - "19999:19999"
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor=unconfined
-    volumes:
-      - netdataconfig:/etc/netdata
-      - netdatalib:/var/lib/netdata
-      - netdatacache:/var/cache/netdata
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
-    environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-
-volumes:
-  netdataconfig:
-  netdatalib:
-  netdatacache:
