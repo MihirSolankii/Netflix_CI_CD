@@ -14,8 +14,34 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_URL=http://backend:5000   # use service name, not localhost
+      - REACT_APP_API_URL=http://backend:5000
     depends_on:
       - backend
     restart: always
 
+  netdata:
+    image: netdata/netdata:latest
+    container_name: netdata
+    ports:
+      - "19999:19999"   # access Netdata dashboard on localhost:19999
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    restart: always
+    volumes:
+      - netdataconfig:/etc/netdata
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/run/docker.sock:/var/run/docker.sock  # very important to monitor other containers
+
+volumes:
+  netdataconfig:
+  netdatalib:
+  netdatacache:
