@@ -1,5 +1,4 @@
 version: '3.8'
-
 services:
   backend:
     build: ./AuthApp
@@ -8,7 +7,10 @@ services:
     env_file:
       - ./AuthApp/.env
     restart: always
-
+    labels:
+      - "netdata.enable=true"
+      - "netdata.service=backend"
+  
   frontend:
     build: ./netflix
     ports:
@@ -18,18 +20,28 @@ services:
     depends_on:
       - backend
     restart: always
-
+    labels:
+      - "netdata.enable=true"
+      - "netdata.service=frontend"
+  
   netdata:
     image: netdata/netdata:latest
     container_name: netdata
+    hostname: netdata-docker
     ports:
-      - "19999:19999"   # access Netdata dashboard on localhost:19999
+      - "19999:19999"
     cap_add:
       - SYS_PTRACE
       - NET_ADMIN
     security_opt:
       - apparmor:unconfined
     restart: always
+    environment:
+      - NETDATA_CLAIM_TOKEN=${NETDATA_CLAIM_TOKEN:-}
+      - NETDATA_CLAIM_URL=https://app.netdata.cloud
+      - NETDATA_CLAIM_ROOMS=${NETDATA_CLAIM_ROOMS:-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - NETDATA_EXTRA_DEB_PACKAGES=curl
     volumes:
       - netdataconfig:/etc/netdata
       - netdatalib:/var/lib/netdata
@@ -39,7 +51,13 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /etc/os-release:/host/etc/os-release:ro
-      - /var/run/docker.sock:/var/run/docker.sock  # very important to monitor other containers
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    networks:
+      - default
+    depends_on:
+      - backend
+      - frontend
 
 volumes:
   netdataconfig:
