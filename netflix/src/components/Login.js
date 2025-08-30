@@ -215,7 +215,7 @@ const NetflixLogin = () => {
             {/* Netflix Logo */}
             <div className="absolute top-6 left-6 z-20">
                 <div className="text-red-600 text-4xl font-black tracking-tight">
-                    NETFLIX
+                    NETFLIX2.0
                 </div>
             </div>
 
